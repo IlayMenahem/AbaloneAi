@@ -15,8 +15,7 @@ class board:
     def __init__(self):
         # board
         # none = 0 empty = 1, white = 2, black = 3
-        self.entries = np.array(
-            [
+        self.entries = np.array([
                 [2, 2, 2, 2, 2, 0, 0, 0, 0],
                 [2, 2, 2, 2, 2, 2, 0, 0, 0],
                 [1, 1, 2, 2, 2, 1, 1, 0, 0],
@@ -26,9 +25,7 @@ class board:
                 [1, 1, 3, 3, 3, 1, 1, 0, 0],
                 [3, 3, 3, 3, 3, 3, 0, 0, 0],
                 [3, 3, 3, 3, 3, 0, 0, 0, 0],
-            ],
-            dtype='i1',
-        )
+            ],dtype='i1',)
 
         #possible positions
         self.pos1 = {}
@@ -827,11 +824,11 @@ class board:
                 return True
         return False
 
-    '''
+    """
     param positions on board
     param the color of the pieces
     return if the color is in the positions
-    '''
+    """
     def on_board(key,color):
         for i in key:
             if (self.board)[i[0]][i[1]] != color:
