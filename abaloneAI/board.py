@@ -7,6 +7,7 @@
 
 from numba import njit
 import numpy as np
+import warnings
 
 class board:
     """
@@ -801,6 +802,104 @@ class board:
         ((4, 6), (3, 6), (2, 6)),
         ((4, 5), (3, 5), (2, 5))]}
 
+    """
+    param position
+    return the entry advnced in a chosen direction
+
+    the functions can advance in the right,left,right up,left up
+    ,right down and left down all respectivly 
+    """
+    def r(entry):
+        res = (entry[0],entry[1]+1)
+        if type(entry) == tuple:
+                return res
+        elif type(entry) == np.ndarray:
+                return np.array(res,dtype='i1')
+
+    def l(entry):
+            res = (entry[0],entry[1]-1)
+            if type(entry) == tuple:
+                    return res
+            elif type(entry) == np.ndarray:
+                    return np.array(res,dtype='i1')
+
+    def ru(entry):
+        if(entry[0]<5):
+            res = (entry[0]-1,entry[1])
+        else:
+            res = (entry[0]-1,entry[1]+1)
+        if type(entry) == tuple:
+                    return res
+        elif type(entry) == np.ndarray:
+                return np.array(res,dtype='i1')
+
+    def lu(entry):
+        if(entry[0]<5):
+            res = (entry[0]-1,entry[1]-1)
+        else:
+            res = (entry[0]-1,entry[1])
+        if type(entry) == tuple:
+                    return res
+        elif type(entry) == np.ndarray:
+                return np.array(res,dtype='i1')
+
+    def rd(entry):
+        if(entry[0]<4):
+            res = (entry[0]+1,entry[1]+1)
+        else:
+            res = (entry[0]+1,entry[1])
+        if type(entry) == tuple:
+                    return res
+        elif type(entry) == np.ndarray:
+                return np.array(res,dtype='i1')
+
+    def ld(entry):
+        if(entry[0]<4):
+            res = (entry[0]+1,entry[1])
+        else:
+            res = (entry[0]+1,entry[1]-1)
+        if type(entry) == tuple:
+                    return res
+        elif type(entry) == np.ndarray:
+                return np.array(res,dtype='i1')
+
+    """
+    param group of positions
+    return the group advnced in a chosen direction
+
+    the functions can advance in the right,left,right up,left up
+    ,right down and left down all respectivly 
+    """
+    def rt(t):
+        if type(t) == tuple:
+            return tuple([r(i) for i in t])
+        elif type(t) == np.ndarray:
+            return np.array((r(t[0]),r(t[1]),r(t[2])))
+    def lt(t):
+        if type(t) == tuple:
+            return tuple([l(i) for i in t])
+        elif type(t) == np.ndarray:
+            return np.array((l(t[0]),l(t[1]),l(t[2])))
+    def rut(t):
+        if type(t) == tuple:
+            return tuple([ru(i) for i in t])
+        elif type(t) == np.ndarray:
+            return np.array((ru(t[0]),ru(t[1]),ru(t[2])))
+    def lut(t):
+        if type(t) == tuple:
+            return tuple([lu(i) for i in t])
+        elif type(t) == np.ndarray:
+            return np.array((lu(t[0]),lu(t[1]),lu(t[2])))
+    def rdt(t):
+        if type(t) == tuple:
+            return tuple([rd(i) for i in t])
+        elif type(t) == np.ndarray:
+            return np.array((rd(t[0]),rd(t[1]),rd(t[2])))
+    def ldt(t):
+        if type(t) == tuple:
+            return tuple([ld(i) for i in t])
+        elif type(t) == np.ndarray:
+            return np.array((ld(t[0]),ld(t[1]),ld(t[2])))
 
     """
     param color
@@ -838,10 +937,23 @@ class board:
     """
     param key
     param move
-    return the direction of the move
+    return the direction of the move in the diffrence to the x to 
     """
     def get_dir(key,move):
-        return np.array((move[0]-key[0],move[1]-key[1]),dtype='i1')
+        if np.array_equal(rt(key),move):
+            return np.array((1,0),'i1')
+        elif np.array_equal(lt(key),move):
+            return np.array((-1,0),'i1')
+        elif np.array_equal(rut(key),move):
+            return np.array((1,1),'i1')
+        elif np.array_equal(lut(key),move):
+            return np.array((-1,1),'i1')
+        elif np.array_equal(rdt(key),move):
+            return np.array((1,-1),'i1')
+        elif np.array_equal(ldt(key),move):
+            return np.array((-1,-1),'i1')
+        else:
+            return np.array((0,0),'i1')
 
     """
     param key
@@ -857,33 +969,64 @@ class board:
 
     """
     param current position
+    param direction
+    return the advenced position in the direction
+    """
+    def get_advance(cur_pos,dir):
+        if np.array_equal(np.array((1,0),'i1'),dir):
+            return rt(cur_pos)
+        elif np.array_equal(np.array((-1,0),'i1'),dir):
+            return lt(cur_pos)
+        elif np.array_equal(np.array((1,1),'i1'),dir):
+            return rut(cur_pos)
+        elif np.array_equal(np.array((-1,1),'i1'),dir):
+            return lut(cur_pos)
+        elif np.array_equal(np.array((1,-1),'i1'),dir):
+            return rdt(cur_pos)
+        elif np.array_equal(np.array((-1,-1),'i1'),dir):
+            return ldt(cur_pos)
+        else:
+            return np.array((0,0),dtype='i1')
+
+    """
+    param current position
+    param direction
+    return if there is a possiblity to advance in the direction, the advenced position in the direction.
+    else it breaks the loop of legal move
+    """
+    def advance(cur_pos,type):
+        advanced = get_advance(cur_pos,type)
+        if (advanced[0] <= 8 and advanced[0] >= 0) and (advanced[1] <= 8 and advanced[1] >= 0):
+            cur_pos = advanced
+        else:
+            return break
+
+    """
+    param current position
     param the move
     return if the move is legal
     """
     def legal_move(key,move,color):
-        key = np.array(key, dtype='i1')
-        move = np.array(move, dtype='i1')
+            key = np.array(key, dtype='i1')
+            move = np.array(move, dtype='i1')
 
-        if move_type(key,move):
-            for pos in move:
-                if (self.board)[pos[0]][pos[1]] != 1:
-                    return False
-            return True
-        
-        else:
-            dir = get_dir(key,move)
-            cur_pos = np.copy(move[0])
-            #warning cur_pos can go out of the board
-            while on_key(key,cur_pos):
-                cur_pos[0] += dir[0]
-                cur_pos[1] += dir[1]
-            count = 0
-            while (self.board)[cur_pos[0]][cur_pos[1]] == opsite(color):
-                count += 1
-                cur_pos[0] += dir[0]
-                cur_pos[1] += dir[1]
-            return count < len(key) and (self.board)[cur_pos[0]][cur_pos[1]] != color
-
+            if move_type(key,move):
+                for pos in move:
+                    if board[pos[0]][pos[1]] != 1:
+                        return False
+                return True
+            
+            else:
+                dir = get_dir(key,move)
+                cur_pos = np.copy(move[0])
+                while on_key(key,cur_pos):
+                    advance(cur_pos,dir)
+                count = 0
+                while self.board[cur_pos[0]][cur_pos[1]] == opsite(color):
+                    count += 1
+                    advance(cur_pos,dir)
+                return count < len(key) and self.board[cur_pos[0]][cur_pos[1]] != color
+                
     """
     param potential moves each representing a unique set
     param the color
@@ -896,9 +1039,9 @@ class board:
     def legal_moves(self,color):
         for key in self.moves:
             if on_board(key,color):
-                to_add = list({})##
+                to_add = list({})
                 for move in (self.moves)[key]:
-                    if legal_move(key,move,color):##
+                    if legal_move(key,move,color):
                         to_add.append(move)
                 if color == 2:
                     self.moves_white[key] = np.array(to_add, dtype= 'i1')

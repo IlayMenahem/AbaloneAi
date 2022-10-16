@@ -29,10 +29,3 @@ class board_test(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-assert br.opsite(color) == 3
-assert br.on_key(key,pos) == True
-assert br.on_board(key,color) == False
-assert br.get_dir(key,move) == np.array((0,-1),dtype='i1')
-assert br.move_type(key,move) == True
-assert br.legal_move(key,move,color) == False
