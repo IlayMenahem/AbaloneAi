@@ -1,11 +1,12 @@
 # TODO:
-# make a game with gui
-# make dictionary creator
-# test all current functions
+# add game gui
+# test dictionary creator
+# resovle the inablity of functions to call other functions
 # enable game actions
-# enable njit if reasonable
+# write and test game main
+# write ai 
+# maybe enable njit and remove tuples from r and rt-ies
 
-from numba import njit
 import numpy as np
 
 class board:
@@ -874,6 +875,7 @@ class board:
             return tuple([r(i) for i in t])
         elif type(t) == np.ndarray:
             return np.array((r(t[0]),r(t[1]),r(t[2])))
+
     def lt(t):
         if type(t) == tuple:
             return tuple([l(i) for i in t])
@@ -900,45 +902,48 @@ class board:
         elif type(t) == np.ndarray:
             return np.array((ld(t[0]),ld(t[1]),ld(t[2])))
 
-    """
-    param color
-    return the opsite color from the one which it is his turn
-    """
-    @njit
+
     def opsite(color):
+        """
+        param color
+        return the opsite color from the one which it is his turn
+        """
         if color == 2:
             return 3
         else:
             return 2
     
-    """
-    param key
-    param position on the board
-    return if the position is on the key
-    """
+    
     def on_key(key,pos):
+        """
+        param key
+        param position on the board
+        return if the position is on the key
+        """
         for i in key:
             if np.array_equal(i,pos):
                 return True
         return False
 
-    """
-    param positions on board
-    param the color of the pieces
-    return if the color is in the positions
-    """
-    def on_board(key,color):
+
+    def on_board(self,key,color):
+        """
+        param positions on board
+        param the color of the pieces
+        return if the color is in the positions
+        """
         for i in key:
             if (self.board)[i[0]][i[1]] != color:
                 return False
         return True
 
-    """
-    param key
-    param move
-    return the direction of the move in the diffrence to the x to 
-    """
+    
     def get_dir(key,move):
+        """
+        param key
+        param move
+        return the direction of the move in the diffrence to the x to 
+        """
         if np.array_equal(rt(key),move):
             return np.array((1,0),'i1')
         elif np.array_equal(lt(key),move):
@@ -954,24 +959,26 @@ class board:
         else:
             return np.array((0,0),'i1')
 
-    """
-    param key
-    param move
-    return if the move has sideways
-    """
+    
     def move_type(key,move):
+        """
+        param key
+        param move
+        return if the move has sideways
+        """
         for i in key:
             for j in move:
                 if np.array_equal(i,j):
                     return False
         return True
 
-    """
-    param current position
-    param direction
-    return the advenced position in the direction
-    """
+    
     def get_advance(cur_pos,dir):
+        """
+        param current position
+        param direction
+        return the advenced position in the direction
+        """
         if np.array_equal(np.array((1,0),'i1'),dir):
             return rt(cur_pos)
         elif np.array_equal(np.array((-1,0),'i1'),dir):
@@ -987,56 +994,59 @@ class board:
         else:
             return np.array((0,0),dtype='i1')
 
-    """
-    param current position
-    param direction
-    return if there is a possiblity to advance in the direction, the advenced position in the direction.
-    else it breaks the loop of legal move
-    """
+    
     def advance(cur_pos,type):
+        """
+        param current position
+        param direction
+        return if there is a possiblity to advance in the direction, the advenced position in the direction.
+        else it breaks the loop of legal move
+        """
         advanced = get_advance(cur_pos,type)
         if (advanced[0] <= 8 and advanced[0] >= 0) and (advanced[1] <= 8 and advanced[1] >= 0):
             cur_pos = advanced
         else:
-            return break
+            return -1
 
-    """
-    param current position
-    param the move
-    return if the move is legal
-    """
+    
     def legal_move(key,move,color):
-            key = np.array(key, dtype='i1')
-            move = np.array(move, dtype='i1')
-
-            if move_type(key,move):
-                for pos in move:
-                    if board[pos[0]][pos[1]] != 1:
-                        return False
-                return True
+        """
+        param current position
+        param the move
+        return if the move is legal
+        """
+        if move_type(key,move):
+            for pos in move:
+                if (self.board)[pos[0]][pos[1]] != 1:
+                    return False
+            return True
+        
+        else:
+            dir = get_dir(key,move)
+            cur_pos = np.copy(move[0])
+            while on_key(key,cur_pos):
+                if advance(cur_pos,dir) == -1:
+                    break
+            count = 0
+            while self.board[cur_pos[0]][cur_pos[1]] == opsite(color):
+                count += 1
+                if advance(cur_pos,dir) == -1:
+                    break
+            return count < len(key) and self.board[cur_pos[0]][cur_pos[1]] != color
             
-            else:
-                dir = get_dir(key,move)
-                cur_pos = np.copy(move[0])
-                while on_key(key,cur_pos):
-                    advance(cur_pos,dir)
-                count = 0
-                while self.board[cur_pos[0]][cur_pos[1]] == opsite(color):
-                    count += 1
-                    advance(cur_pos,dir)
-                return count < len(key) and self.board[cur_pos[0]][cur_pos[1]] != color
-                
-    """
-    param potential moves each representing a unique set
-    param the color
-    return a dictionary with all the legal moves
+    
+    def legal_moves(color):
+        """
+        param potential moves each representing a unique set
+        param the color
+        return a dictionary with all the legal moves
 
-    idea of the code
-    for each key in check if it's on the board, and if yes add it to res.
-    for each key on the board iterate over the possible moves, and check if they are legal.
-    """
-    def legal_moves(self,color):
-        for key in self.moves:
+        idea of the code
+        for each key in check if it's on the board, and if yes add it to res.
+        for each key on the board iterate over the possible moves, and check if they are legal.
+        """
+        for key1 in self.moves:
+            key = np.array(key1,dtype='i1')
             if on_board(key,color):
                 to_add = list({})
                 for move in (self.moves)[key]:
