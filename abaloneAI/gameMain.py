@@ -1,4 +1,4 @@
-import abaloneAI.board as br
+import abaloneAI.Board as br
 
 number_of_games = 1000
 max_turns = 150

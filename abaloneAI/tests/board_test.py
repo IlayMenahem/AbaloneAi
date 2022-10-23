@@ -1,4 +1,4 @@
-import abaloneAI.board as br
+import abaloneAI.Board as br
 import unittest
 import numpy as np
 

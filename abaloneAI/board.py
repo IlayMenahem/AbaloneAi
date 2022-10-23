@@ -1907,7 +1907,6 @@ class Board:
         """
         return self.num_of_blacks
 
-
     """
     param position
     return the entry advnced in a chosen direction
@@ -2086,32 +2085,16 @@ class Board:
                     return True
             return False
 
-    def on_board(key,color):
+    def on_board(self,key,color):
         """
         param positions on board
         param the color of the pieces
         return if the color is in the positions
         """
         for i in key:
-            if board[i[0]][i[1]] != color:
+            if (self.board)[i[0]][i[1]] != color:
                 return False
         return True
-    
-    def get_advance(cur_pos,dir):
-        if np.array_equal(np.array((1,0),'i1'),dir):
-            return r(cur_pos)
-        elif np.array_equal(np.array((-1,0),'i1'),dir):
-            return l(cur_pos)
-        elif np.array_equal(np.array((1,1),'i1'),dir):
-            return ru(cur_pos)
-        elif np.array_equal(np.array((-1,1),'i1'),dir):
-            return lu(cur_pos)
-        elif np.array_equal(np.array((1,-1),'i1'),dir):
-            return rd(cur_pos)
-        elif np.array_equal(np.array((-1,-1),'i1'),dir):
-            return ld(cur_pos)
-        else:
-            return np.array((0,0),dtype='i1')
 
     def legal_move(self,key,move,color):
         """
@@ -2121,7 +2104,7 @@ class Board:
         """
         if move_type(key,move):
             for pos in move:
-                if board[pos[0]][pos[1]] != 1:
+                if (self.board)[pos[0]][pos[1]] != 1:
                     return False
             return True
         
@@ -2136,16 +2119,16 @@ class Board:
                     break
             count = 0
 
-            while board[cur_pos[0]][cur_pos[1]] == opposite(color):
+            while (self.board)[cur_pos[0]][cur_pos[1]] == opposite(color):
                 count += 1
                 try:
                     cur_pos = advance(cur_pos,dir)
                 except:
                     break
 
-            return count < len(key) and board[cur_pos[0]][cur_pos[1]] != color
+            return count < len(key) and (self.board)[cur_pos[0]][cur_pos[1]] != color
 
-    def legal_moves(color):
+    def legal_moves(self,color):
         """
         param potential moves each representing a unique set
         param the color
@@ -2156,68 +2139,46 @@ class Board:
         for each key on the board iterate over the possible moves, and check if they are legal.
         """
         #passes over every key
-        for key in moves:
+        for key in self.moves:
             if on_board(key,color):
 
                 to_add = list({})
 
-                for move in moves[key]:
+                for move in (self.moves)[key]:
                     if legal_move(key,move,color):
                         to_add.append(move)
                 
                 #checks where to add the moves
                 if len(to_add) != 0:
                     if color == 2:
-                        moves_white[key] = np.array(to_add, dtype= 'i1')
+                        (self.moves_white)[key] = np.array(to_add, dtype= 'i1')
                     else:
-                        moves_black[key] = np.array(to_add, dtype= 'i1')
+                        (self.moves_black)[key] = np.array(to_add, dtype= 'i1')
 
-    def legal_moves(color):
-        """
-        param potential moves each representing a unique set
-        param the color
-        return a dictionary with all the legal moves
-
-        idea of the code
-        for each key in check if it's on the board, and if yes add it to res.
-        for each key on the board iterate over the possible moves, and check if they are legal.
-        """
-        for key1 in self.moves:
-            key = np.array(key1,dtype='i1')
-            if on_board(key,color):
-                to_add = list({})
-                for move in (self.moves)[key]:
-                    if legal_move(key,move,color):
-                        to_add.append(move)
-                if color == 2:
-                    self.moves_white[key] = np.array(to_add, dtype= 'i1')
-                else:
-                    self.moves_black[key] = np.array(to_add, dtype= 'i1')
-
-    def first(key,move):
+    def first(self,key,move):
         for i in key:
             if not in_key(move,i):
                 return i
 
-    def move_(color,key,move):
+    def move_(self,color,key,move):
         if move_type(key,move):
             for pos in key:
-                board[pos[0]][pos[1]] = 0
+                (self.board)[pos[0]][pos[1]] = 0
             for pos in move:
-                board[pos[0]][pos[1]] = color
+                (self.board)[pos[0]][pos[1]] = color
         
         else:
             dir = get_dir(key,move)
             cur_pos = first(key,move)
-            last_color = board[cur_pos[0]][cur_pos[1]]
+            last_color = (self.board)[cur_pos[0]][cur_pos[1]]
             
-            board[cur_pos[0]][cur_pos[1]] = 1
+            (self.board)[cur_pos[0]][cur_pos[1]] = 1
             
             while last_color != 1 and last_color != 0:
                 try:
                     cur_pos = advance(cur_pos,dir)
-                    cur_color = board[cur_pos[0]][cur_pos[1]]
-                    board[cur_pos[0]][cur_pos[1]] = last_color
+                    cur_color = (self.board)[cur_pos[0]][cur_pos[1]]
+                    (self.board)[cur_pos[0]][cur_pos[1]] = last_color
                     last_color = cur_color
                 except:
                     break
