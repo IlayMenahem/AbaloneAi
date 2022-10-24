@@ -1,5 +1,6 @@
 """
-Board class
+game board class 
+the class contains a counstractor and a ability to mkae moves
 """
 
 # TODO:
@@ -11,14 +12,14 @@ Board class
 import numpy as np
 import ast
 
-class Board:
+class Game_Board:
     """
     counstracts a new board
     """
     def __init__(self):
         # board
         # none = 0 empty = 1, white = 2, black = 3
-        self.entries = np.array([
+        self.board = np.array([
                 [2, 2, 2, 2, 2, 0, 0, 0, 0],
                 [2, 2, 2, 2, 2, 2, 0, 0, 0],
                 [1, 1, 2, 2, 2, 1, 1, 0, 0],
@@ -112,51 +113,51 @@ class Board:
     """
     def rt(self,t):
         if len(t) == 1:
-            return np.array((r(t[0])))
+            return np.array((self.r(t[0])))
         elif len(t) == 2:
-            return np.array((r(t[0]),r(t[1])))
+            return np.array((self.r(t[0]),self.r(t[1])))
         else:
-            return np.array((r(t[0]),r(t[1]),r(t[2])))
+            return np.array((self.r(t[0]),self.r(t[1]),self.r(t[2])))
 
     def lt(self,t):
         if len(t) == 1:
-            return np.array((l(t[0])))
+            return np.array((self.l(t[0])))
         elif len(t) == 2:
-            return np.array((l(t[0]),l(t[1])))
+            return np.array((self.l(t[0]),self.l(t[1])))
         else:
-            return np.array((l(t[0]),l(t[1]),l(t[2])))
+            return np.array((self.l(t[0]),self.l(t[1]),self.l(t[2])))
 
     def rut(self,t):
         if len(t) == 1:
-            return np.array((ru(t[0])))
+            return np.array((self.ru(t[0])))
         elif len(t) == 2:
-            return np.array((ru(t[0]),ru(t[1])))
+            return np.array((self.ru(t[0]),self.ru(t[1])))
         else:
-            return np.array((ru(t[0]),ru(t[1]),ru(t[2])))
+            return np.array((self.ru(t[0]),self.ru(t[1]),self.ru(t[2])))
 
     def lut(self,t):
         if len(t) == 1:
-            return np.array((lu(t[0])))
+            return np.array((self.lu(t[0])))
         elif len(t) == 2:
-            return np.array((lu(t[0]),lu(t[1])))
+            return np.array((self.lu(t[0]),self.lu(t[1])))
         else:
-            return np.array((lu(t[0]),lu(t[1]),lu(t[2])))
+            return np.array((self.lu(t[0]),self.lu(t[1]),self.lu(t[2])))
 
     def rdt(self,t):
         if len(t) == 1:
-            return np.array((rd(t[0])))
+            return np.array((self.rd(t[0])))
         elif len(t) == 2:
-            return np.array((rd(t[0]),rd(t[1])))
+            return np.array((self.rd(t[0]),self.rd(t[1])))
         else:
-            return np.array((rd(t[0]),rd(t[1]),rd(t[2])))
+            return np.array((self.rd(t[0]),self.rd(t[1]),self.rd(t[2])))
 
     def ldt(self,t):
         if len(t) == 1:
-            return np.array((ld(t[0])))
+            return np.array((self.ld(t[0])))
         elif len(t) == 2:
-            return np.array((ld(t[0]),ld(t[1])))
+            return np.array((self.ld(t[0]),self.ld(t[1])))
         else:
-            return np.array((ld(t[0]),ld(t[1]),ld(t[2])))
+            return np.array((self.ld(t[0]),self.ld(t[1]),self.ld(t[2])))
 
     def get_dir(self,key,move):
         """
@@ -164,17 +165,17 @@ class Board:
         param move
         return the direction of movement
         """
-        if np.array_equal(rt(key),move):
+        if np.array_equal(self.rt(key),move):
             return 'r'
-        elif np.array_equal(lt(key),move):
+        elif np.array_equal(self.lt(key),move):
             return 'l'
-        elif np.array_equal(rut(key),move):
+        elif np.array_equal(self.rut(key),move):
             return 'ru'
-        elif np.array_equal(lut(key),move):
+        elif np.array_equal(self.lut(key),move):
             return 'lu'
-        elif np.array_equal(rdt(key),move):
+        elif np.array_equal(self.rdt(key),move):
             return 'rd'
-        elif np.array_equal(ldt(key),move):
+        elif np.array_equal(self.ldt(key),move):
             return 'ld'
         else:
             return ''
@@ -187,17 +188,17 @@ class Board:
         """
         res = ''
         if dir == 'r':
-            res = r(cur_pos)
+            res = self.r(cur_pos)
         elif dir == 'l':
-            res = l(cur_pos)
+            res = self.l(cur_pos)
         elif dir == 'ru':
-            res = ru(cur_pos)
+            res = self.ru(cur_pos)
         elif dir == 'lu':
-            res = lu(cur_pos)
+            res = self.lu(cur_pos)
         elif dir == 'rd':
-            res = rd(cur_pos)
+            res = self.rd(cur_pos)
         elif dir == 'ld':
-            res = ld(cur_pos)
+            res = self.ld(cur_pos)
         else:
             raise Exception("IllegalDirection")
         
@@ -256,27 +257,27 @@ class Board:
         param the move
         return if the move is legal
         """
-        if move_type(key,move):
+        if self.move_type(key,move):
             for pos in move:
                 if (self.board)[pos[0]][pos[1]] != 1:
                     return False
             return True
         
         else:
-            dir = get_dir(key,move)
+            dir = self.get_dir(key,move)
             cur_pos = np.copy(move[0])
             
-            while in_key(key,cur_pos):
+            while self.in_key(key,cur_pos):
                 try:
-                    cur_pos = advance(cur_pos,dir)
+                    cur_pos = self.advance(cur_pos,dir)
                 except:
                     break
             count = 0
 
-            while (self.board)[cur_pos[0]][cur_pos[1]] == opposite(color):
+            while (self.board)[cur_pos[0]][cur_pos[1]] == self.opposite(color):
                 count += 1
                 try:
-                    cur_pos = advance(cur_pos,dir)
+                    cur_pos = self.advance(cur_pos,dir)
                 except:
                     break
 
@@ -294,12 +295,12 @@ class Board:
         """
         #passes over every key
         for key in self.moves:
-            if on_board(key,color):
+            if self.on_board(key,color):
 
                 to_add = list({})
 
                 for move in (self.moves)[key]:
-                    if legal_move(key,move,color):
+                    if self.legal_move(key,move,color):
                         to_add.append(move)
                 
                 #checks where to add the moves
@@ -310,27 +311,37 @@ class Board:
                         (self.moves_black)[key] = np.array(to_add, dtype= 'i1')
 
     def first(self,key,move):
-        for i in key:
-            if not in_key(move,i):
-                return i
+        """
+        param key
+        param move
+        returns the position in key which isn't present in move"""
+        if not self.in_key(move,key[0]):
+            return np.array(key[0],dtype='i1')
+        return np.array(key[len(key)-1],dtype='i1')
 
     def move_(self,color,key,move):
-        if move_type(key,move):
+        """
+        param color
+        param key
+        param move
+        makes the move on the board
+        """
+        if self.move_type(key,move):
             for pos in key:
                 (self.board)[pos[0]][pos[1]] = 0
             for pos in move:
                 (self.board)[pos[0]][pos[1]] = color
         
         else:
-            dir = get_dir(key,move)
-            cur_pos = first(key,move)
+            dir = self.get_dir(key,move)
+            cur_pos = self.first(key,move)
             last_color = (self.board)[cur_pos[0]][cur_pos[1]]
             
             (self.board)[cur_pos[0]][cur_pos[1]] = 1
             
             while last_color != 1 and last_color != 0:
                 try:
-                    cur_pos = advance(cur_pos,dir)
+                    cur_pos = self.advance(cur_pos,dir)
                     cur_color = (self.board)[cur_pos[0]][cur_pos[1]]
                     (self.board)[cur_pos[0]][cur_pos[1]] = last_color
                     last_color = cur_color
