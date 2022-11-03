@@ -1,18 +1,18 @@
 """
-game board class 
-the class contains a counstractor and a ability to mkae moves
+game board class
+the class contains a counstractor and a ability to make moves
 """
 
-# TODO:
-# resolve in ability of functions to call other functions inthe class
 # write and test game main
-# create intrface
 # write ai
 
-import numpy as np
+
 import ast
 
-class Game_Board:
+import numpy as np
+
+
+class GameBoard:
     """
     counstracts a new board
     """
@@ -45,10 +45,40 @@ class Game_Board:
         self.moves_black = {}
         self.moves_white = {}
 
-        with open('large_variables/moves.txt', 'r') as f:
+        #check
+        with open('large_variables/moves.txt', 'r',encoding='txt') as f:
             dic = f.read()
-        
+
         self.moves = ast.literal_eval(dic)
+
+    def row_length(self,row):
+        """
+        param row
+        return row length
+        """
+        if(row<5):
+            return row+5
+        return 13-row
+
+    def to_string(self):
+        """
+        prints the board
+        """
+        board = self.board.tolist()
+        for row in range(9):
+            for pos in range(9):
+                if board[row][pos] == 1:
+                    board[row][pos] = '.'
+                elif board[row][pos] == 2:
+                    board[row][pos] = 'O'
+                elif board[row][pos] == 3:
+                    board[row][pos] = 'X'
+                else:
+                    board[row][pos] = ''
+
+        for row in range(9):
+            length = 15-self.row_length(row)
+            print(" "*length +' '.join(board[row]))
 
     def get_whites(self):
         """
@@ -103,7 +133,7 @@ class Game_Board:
         else:
             res = (entry[0]+1,entry[1]-1)
         return np.array(res,dtype='i1')
-    
+
     """
     param group of positions
     return the group advnced in a chosen direction
@@ -200,10 +230,10 @@ class Game_Board:
         elif dir == 'ld':
             res = self.ld(cur_pos)
         else:
-            raise Exception("IllegalDirection")
-        
+            raise ValueError("IllegalDirection")
+
         if not((res[0] <= 8 and res[0] >= 0) and (res[1] <= 8 and res[1] >= 0)):
-            raise Exception("IndexOutOfBoard")
+            raise ValueError("IndexOutOfBoard")
 
         return res
 
@@ -219,26 +249,27 @@ class Game_Board:
                     return False
         return True
 
-    def opposite(self,color):
-            """
-            param color
-            return the opposite color from the one which it is his turn
-            """
-            if color == 2:
-                return 3
-            else:
-                return 2
+    @classmethod
+    def opposite(cls,color):
+        """
+        param color
+        return the opposite color from the one which it is his turn
+        """
+        if color == 2:
+            return 3
+        else:
+            return 2
 
     def in_key(self,key,pos):
-            """
-            param key
-            param position on the board
-            return if the position is in the key
-            """
-            for i in key:
-                if np.array_equal(i,pos):
-                    return True
-            return False
+        """
+        param key
+        param position on the board
+        return if the position is in the key
+        """
+        for i in key:
+            if np.array_equal(i,pos):
+                return True
+        return False
 
     def on_board(self,key,color):
         """
@@ -262,15 +293,15 @@ class Game_Board:
                 if (self.board)[pos[0]][pos[1]] != 1:
                     return False
             return True
-        
+
         else:
             dir = self.get_dir(key,move)
             cur_pos = np.copy(move[0])
-            
+
             while self.in_key(key,cur_pos):
                 try:
                     cur_pos = self.advance(cur_pos,dir)
-                except:
+                except ValueError:
                     break
             count = 0
 
@@ -278,7 +309,7 @@ class Game_Board:
                 count += 1
                 try:
                     cur_pos = self.advance(cur_pos,dir)
-                except:
+                except ValueError:
                     break
 
             return count < len(key) and (self.board)[cur_pos[0]][cur_pos[1]] != color
@@ -302,7 +333,7 @@ class Game_Board:
                 for move in (self.moves)[key]:
                     if self.legal_move(key,move,color):
                         to_add.append(move)
-                
+
                 #checks where to add the moves
                 if len(to_add) != 0:
                     if color == 2:
@@ -331,19 +362,19 @@ class Game_Board:
                 (self.board)[pos[0]][pos[1]] = 0
             for pos in move:
                 (self.board)[pos[0]][pos[1]] = color
-        
+
         else:
             dir = self.get_dir(key,move)
             cur_pos = self.first(key,move)
             last_color = (self.board)[cur_pos[0]][cur_pos[1]]
-            
+
             (self.board)[cur_pos[0]][cur_pos[1]] = 1
-            
+
             while last_color != 1 and last_color != 0:
                 try:
                     cur_pos = self.advance(cur_pos,dir)
                     cur_color = (self.board)[cur_pos[0]][cur_pos[1]]
                     (self.board)[cur_pos[0]][cur_pos[1]] = last_color
                     last_color = cur_color
-                except:
+                except ValueError:
                     break

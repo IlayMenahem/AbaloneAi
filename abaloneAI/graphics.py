@@ -1,10 +1,13 @@
 from PIL import Image, ImageDraw
 
 def row_length(row):
+    """
+    param row
+    return row length
+    """
     if(row<5):
         return row+5
-    else:
-        return 13-row
+    return 13-row
 
 def state2pic(board):
     #1 empty
