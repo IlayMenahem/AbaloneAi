@@ -345,7 +345,8 @@ class GameBoard:
         """
         param key
         param move
-        returns the position in key which isn't present in move"""
+        returns the position in key which isn't present in move
+        """
         if not self.in_key(move,key[0]):
             return np.array(key[0],dtype='i1')
         return np.array(key[len(key)-1],dtype='i1')
